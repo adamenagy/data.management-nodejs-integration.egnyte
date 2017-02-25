@@ -36,12 +36,12 @@ module.exports = {
   // Required scope of the token sent to the client
   scopePublic: 'data:read',
 
-  // BOX configuration
-  box: {
-    callbackURL: process.env.BOX_CALLBACK_URL || 'http://localhost:3000/api/box/callback/oauth',
+  // Egnyte configuration
+  egnyte: {
+    callbackURL: process.env.EGNYTE_CALLBACK_URL || 'http://localhost:3000/api/egnyte/callback/oauth',
     credentials: {
-      client_id: process.env.BOX_CLIENT_ID || '<replace with your box client id',
-      client_secret: process.env.BOX_CLIENT_SECRET || '<replace with your box client secret'
+      client_id: process.env.EGNYTE_CLIENT_ID || '<replace with your egnyte client id',
+      client_secret: process.env.EGNYTE_CLIENT_SECRET || '<replace with your egnyte client secret'
     }
   }
 };

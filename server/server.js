@@ -48,15 +48,15 @@ app.use('/fonts', express.static(__dirname + '/../node_modules/bootstrap/dist/fo
 app.set('port', process.env.PORT || 3000); // main port
 
 // prepare our API endpoint routing
-var oauth = require('./oauth');
+var oauth = require('./oauth.js');
 var datamanagement = require('./data.management.tree.js');
 var modelderivative = require('./model.derivative.js');
-var box = require('./box.tree');
-var integration = require('./data.management.box.integration');
+var egnyte = require('./egnyte.tree.js');
+var integration = require('./data.management.egnyte.integration.js');
 app.use('/', oauth); // redirect oauth API calls
 app.use('/', datamanagement); // redirect our custom API calls
 app.use('/', modelderivative); // redirect our custom API calls
-app.use('/', box); // redirect oauth API calls
+app.use('/', egnyte); // redirect oauth API calls
 app.use('/', integration); // redirect oauth API calls
 
 module.exports = app;

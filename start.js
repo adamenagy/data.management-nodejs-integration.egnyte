@@ -19,9 +19,19 @@
 'use strict';
 
 var app = require('./server/server');
+var fs = require('fs');
+var https = require('https');
+
+var options = {
+  key: fs.readFileSync('/etc/apache2/ssl/server.key'),
+  cert: fs.readFileSync('/etc/apache2/ssl/server.crt'),
+  passphrase: 'erny97',
+  requestCert: false,
+  rejectUnauthorized: false
+};
 
 // start server
-var server = app.listen(app.get('port'), function () {
+var server = https.createServer(options, app).listen(app.get('port'), function () {
   if (process.env.FORGE_CLIENT_ID == null || process.env.FORGE_CLIENT_SECRET == null)
     console.log('*****************\nWARNING: Forge Client ID & Client Secret not defined as environment variables.\n*****************');
 

@@ -17,34 +17,34 @@
 /////////////////////////////////////////////////////////////////////
 
 $(document).ready(function () {
-  var auth = isBoxAuthorized();
-  if (!isBoxAuthorized()) {
-    $('#refreshBoxTree').hide();
-    $('#loginBox').click(boxSignIn);
+  var auth = isEgnyteAuthorized();
+  if (!isEgnyteAuthorized()) {
+    $('#refreshEgnyteTree').hide();
+    $('#loginEgnyte').click(egnyteSignIn);
   }
   else {
-    $('#loginBox').hide();
-    $('#refreshBoxTree').show();
-    $('#refreshBoxTree').click(function(){
-      $('#myBoxFiles').jstree(true).refresh();
+    $('#loginEgnyte').hide();
+    $('#refreshEgnyteTree').show();
+    $('#refreshEgnyteTree').click(function(){
+      $('#myEgnyteFiles').jstree(true).refresh();
     });
-    prepareBoxTree();
+    prepareEgnyteTree();
   }
 });
 
-function boxSignIn() {
+function egnyteSignIn() {
   jQuery.ajax({
-    url: '/box/authenticate',
+    url: '/egnyte/authenticate',
     success: function (rootUrl) {
       location.href = rootUrl;
     }
   });
 }
 
-function isBoxAuthorized() {
+function isEgnyteAuthorized() {
   var ret = 'false';
   jQuery.ajax({
-    url: '/box/isAuthorized',
+    url: '/egnyte/isAuthorized',
     success: function (res) {
       ret = res;
     },
@@ -53,12 +53,12 @@ function isBoxAuthorized() {
   return (ret === 'true');
 }
 
-function prepareBoxTree() {
-  $('#myBoxFiles').jstree({
+function prepareEgnyteTree() {
+  $('#myEgnyteFiles').jstree({
     'core': {
       'themes': {"icons": true},
       'data': {
-        "url": '/box/getTreeNode',
+        "url": '/egnyte/getTreeNode',
         "dataType": "json",
         'multiple': false,
         "data": function (node) {
@@ -78,21 +78,21 @@ function prepareBoxTree() {
       }
     },
     "plugins": ["types", "state", "sort", "contextmenu"],
-    contextmenu: {items: boxCustomMenu}
+    contextmenu: {items: egnyteCustomMenu}
   });
 }
 
-function boxCustomMenu(boxNode) {
+function egnyteCustomMenu(node) {
   var items;
 
-  if (boxNode.type == 'file') {
+  if (node.type == 'file') {
     items = {
       renameItem: {
         label: "Send to Autodesk",
         icon: "/img/autodesk-forge.png",
         action: function () {
           var autodeskNode = $('#myAutodeskFiles').jstree(true).get_selected(true)[0];
-          sendToAutodesk(boxNode, autodeskNode);
+          sendToAutodesk(node, autodeskNode);
         }
       }
     };
@@ -102,18 +102,18 @@ function boxCustomMenu(boxNode) {
 
 var re = /(?:\.([^.]+))?$/; // regex to extract file extension
 
-function sendToAutodesk(boxNode, autodeskNode) {
+function sendToAutodesk(egnyteNode, autodeskNode) {
   if (autodeskNode == null || (autodeskNode.type != 'projects' && autodeskNode.type != 'folders')) {
     $.notify('Please select a Project or Folder on Autodesk Hubs', 'error');
     return;
   }
 
-  isFileSupported(re.exec(boxNode.text)[1], function (supported) {
+  isFileSupported(re.exec(egnyteNode.text)[1], function (supported) {
     if (!supported) {
-      $.notify('File "' + boxNode.text + '" cannot be translated to Forge Viewer', 'warn');
+      $.notify('File "' + egnyteNode.text + '" cannot be translated to Forge Viewer', 'warn');
     }
 
-    $.notify('Preparing to send file "' + boxNode.text + '" to "' + autodeskNode.text + '" Autodesk ' + autodeskNode.type, 'info');
+    $.notify('Preparing to send file "' + egnyteNode.text + '" to "' + autodeskNode.text + '" Autodesk ' + autodeskNode.type, 'info');
 
     jQuery.ajax({
       url: '/integration/sendToAutodesk',
@@ -123,7 +123,7 @@ function sendToAutodesk(boxNode, autodeskNode) {
       data: JSON.stringify({
         'autodesktype': autodeskNode.type, // projects or folders
         'autodeskid': autodeskNode.id,
-        'boxfile': boxNode.id
+        'boxfile': egnyteNode.id
       }),
       success: function (res) {
         $.notify('Transfer of file "' + res.file + '" completed', 'info');

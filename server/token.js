@@ -42,18 +42,18 @@ Token.prototype.isAuthorized = function () {
   return (this._session.tokenpublic != null);
 };
 
-// box token handling
+// Egnyte token handling
 
-Token.prototype.getBoxToken = function () {
-  return this._session.boxtoken;
+Token.prototype.getEgnyteToken = function () {
+  return this._session.egnytetoken;
 };
 
-Token.prototype.setBoxToken = function (token) {
-  this._session.boxtoken = token;
+Token.prototype.setEgnyteToken = function (token) {
+  this._session.egnytetoken = token;
 };
 
-Token.prototype.isBoxAuthorized = function () {
-  return (this._session != null && this._session.boxtoken != null);
+Token.prototype.isEgnyteAuthorized = function () {
+  return (this._session != null && this._session.egnytetoken != null);
 };
 
 module.exports = Token;

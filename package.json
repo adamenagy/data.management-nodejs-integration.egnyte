@@ -9,14 +9,17 @@
     "cookie-parser": "*",
     "express": "*",
     "express-session": "*",
-    "forge-data-management": "*",
-    "forge-model-derivative": "*",
-    "forge-oauth2": "*",
+    "forge-data-management": "2.0.5",
+    "forge-model-derivative": "2.0.4",
+    "forge-oauth2": "1.0.4",
     "forge-oss": "*",
     "jquery": "*",
     "jstree": "*",
     "moment": "*",
-    "request": "*"
+    "request": "*",
+    "egnyte-js-sdk": "*",
+    "https": "*",
+    "fs": "*"
   },
   "repository": {
     "type": "git",
