@@ -73,12 +73,12 @@ function autodeskCustomMenu(autodeskNode) {
 
   if (autodeskNode.type == 'versions') {
     items = {
-      sendToBox: {
-        label: "Send to Box",
-        icon: "/img/box-logo.png",
+      sendToEgnyte: {
+        label: "Send to Egnyte",
+        icon: "/img/egnyte-logo-32.png",
         action: function () {
-          var boxNode = $('#myBoxFiles').jstree(true).get_selected(true)[0];
-          sendToBox(autodeskNode, boxNode);
+          var egnyteNode = $('#myEgnyteFiles').jstree(true).get_selected(true)[0];
+          sendToEgnyte(autodeskNode, egnyteNode);
         }
       }
     };
@@ -87,25 +87,25 @@ function autodeskCustomMenu(autodeskNode) {
   return items;
 }
 
-function sendToBox(autodeskNode, boxNode) {
-  if (boxNode == null || boxNode.type != 'folder') {
-    $.notify('Please select a folder on Box Folders', 'error');
+function sendToEgnyte(autodeskNode, egnyteNode) {
+  if (egnyteNode == null || egnyteNode.type != 'folder') {
+    $.notify('Please select a folder on Egnyte Folders', 'error');
     return;
   }
-  $.notify('Preparing to send file "' + autodeskNode.text + '" to "' + boxNode.text + '" box ' + boxNode.type, 'info');
+  $.notify('Preparing to send file "' + autodeskNode.text + '" to "' + egnyteNode.text + '" Egnyte ' + egnyteNode.type, 'info');
 
   jQuery.ajax({
-    url: '/integration/sendToBox',
+    url: '/integration/sendToEgnyte',
     contentType: 'application/json',
     type: 'POST',
     dataType: 'json',
     data: JSON.stringify({
       'autodeskfile': autodeskNode.id,
-      'boxfolder': boxNode.id
+      'egnytefolder': egnyteNode.id
     }),
     success: function (res) {
       $.notify('Transfer of file "' + res.file + '" completed', 'info');
-      $('#myBoxFiles').jstree(true).refresh_node(boxNode);
+      $('#myEgnyteFiles').jstree(true).refresh_node(egnyteNode);
     },
     error: function (res) {
       res = JSON.parse(res.responseText);

@@ -20,14 +20,14 @@ $(document).ready(function () {
   var currentToken = getForgeToken();
 
   if (currentToken === '')
-    $('#signInButton').click(forgeSignIn);
+    $('#loginAutodesk').click(forgeSignIn);
   else {
     getForgeUserProfile(function (profile) {
-      $('#signInProfileImage').removeClass(); // remove glyphicon-user
-      $('#signInProfileImage').html('<img src="' + profile.picture + '"/>')
-      $('#signInButtonText').text(profile.name);
-      $('#signInButtonText').attr('title', 'Click to forgeLogoff');
-      $('#signInButton').click(forgeLogoff);
+      $('#loginAutodeskProfileImage').removeClass(); // remove glyphicon-user
+      $('#loginAutodeskProfileImage').html('<img src="' + profile.picture + '"/>')
+      $('#loginAutodeskText').text(profile.name);
+      $('#loginAutodeskText').attr('title', 'Click to forgeLogoff');
+      $('#loginAutodesk').click(forgeLogoff);
     });
   }
 });

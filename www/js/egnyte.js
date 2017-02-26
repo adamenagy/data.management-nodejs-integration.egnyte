@@ -21,9 +21,11 @@ $(document).ready(function () {
   if (!isEgnyteAuthorized()) {
     $('#refreshEgnyteTree').hide();
     $('#loginEgnyte').click(egnyteSignIn);
-  }
-  else {
-    $('#loginEgnyte').hide();
+  } else {
+    getEgnyteUserProfile(function (profile) {
+      $('#loginEgnyteText').text(profile.name);
+    });
+
     $('#refreshEgnyteTree').show();
     $('#refreshEgnyteTree').click(function(){
       $('#myEgnyteFiles').jstree(true).refresh();
@@ -123,7 +125,7 @@ function sendToAutodesk(egnyteNode, autodeskNode) {
       data: JSON.stringify({
         'autodesktype': autodeskNode.type, // projects or folders
         'autodeskid': autodeskNode.id,
-        'boxfile': egnyteNode.id
+        'egnytefile': egnyteNode.id
       }),
       success: function (res) {
         $.notify('Transfer of file "' + res.file + '" completed', 'info');
@@ -145,6 +147,16 @@ function isFileSupported(extension, callback) {
     dataType: 'json',
     success: function (supportedFormats) {
       callback(( jQuery.inArray(extension, supportedFormats) >= 0));
+    }
+  });
+}
+
+function getEgnyteUserProfile(onsuccess) {
+  var profile = '';
+  jQuery.ajax({
+    url: '/egnyte/profile',
+    success: function (profile) {
+      onsuccess(JSON.parse(profile));
     }
   });
 }

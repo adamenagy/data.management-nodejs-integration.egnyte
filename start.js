@@ -35,8 +35,8 @@ var server = https.createServer(options, app).listen(app.get('port'), function (
   if (process.env.FORGE_CLIENT_ID == null || process.env.FORGE_CLIENT_SECRET == null)
     console.log('*****************\nWARNING: Forge Client ID & Client Secret not defined as environment variables.\n*****************');
 
-  if (process.env.BOX_CLIENT_ID == null || process.env.BOX_CLIENT_SECRET == null)
-    console.log('*****************\nWARNING: Box Client ID & Client Secret not defined as environment variables.\n*****************');
+  if (process.env.EGNYTE_CLIENT_ID == null || process.env.EGNYTE_CLIENT_SECRET == null)
+    console.log('*****************\nWARNING: Egnyte Client ID & Client Secret not defined as environment variables.\n*****************');
 
   console.log('Starting at ' + (new Date()).toString());
   console.log('Server listening on port ' + server.address().port);

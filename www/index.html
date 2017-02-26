@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Autodesk Forge Integration with Box</title>
+  <title>Autodesk Forge Integration with Egnyte</title>
   <!-- Common packages: JQuery & Bootstrap -->
   <link rel="stylesheet" href="/css/bootstrap.min.css">
   <link rel="stylesheet" href="/css/jstree/style.css"/>
@@ -46,13 +46,13 @@
   <div class="row">
     <div class="col-sm-6">
       <div class="panel panel-default">
-        <div class="panel-heading" data-toggle="tooltip"> Autodesk Hubs
+        <div class="panel-heading" data-toggle="tooltip">Autodesk Hubs
           <img src="/img/refresh.png" id="refreshAutodeskTree" style="vertical-align: top; cursor: pointer" title="Refresh Autodesk files" height="20"/>
-          <button id="signInButton" style="float:right;" class="btn btn-xs btn-default">
-          <span id="signInProfileImage">
-            <img src="/img/autodesk-logo.png" height="16"/>
-          </span>
-            <span id="signInButtonText" title="Sign in with your Autodesk Account">Account</span>
+          <button id="loginAutodesk" style="float:right;" class="btn btn-xs btn-default">
+            <span id="loginAutodeskProfileImage">
+              <img src="/img/autodesk-logo.png" height="16" />
+            </span>
+            <span id="loginAutodeskText" title="Sign in with your Autodesk Account">Account</span>
           </button>
         </div>
         <div id="myAutodeskFiles" class="foldertree">
@@ -62,10 +62,14 @@
     <div class="col-sm-6">
       <div class="panel panel-default">
         <div class="panel-heading" data-toggle="tooltip">Egnyte Folders
-          <button id="loginEgnyte" class="btn btn-xs btn-default" style="float:right;">
-            <img src="img/box-logo.png" height="14" style="vertical-align: top;"/> Account
-          </button>
           <img src="/img/refresh.png" id="refreshEgnyteTree" style="vertical-align: top; cursor: pointer" title="Refresh Egnyte files" height="20"/>
+          <button id="loginEgnyte" class="btn btn-xs btn-default" style="float:right;">
+            <span id="loginEgnyteProfileImage">
+              <img src="img/egnyte-logo.png" height="16" />
+            </span>
+            <span id="loginEgnyteText" title="Sign in with your Egnyte Account">Account</span>
+          </button>
+
         </div>
         <div id="myEgnyteFiles" class="foldertree">
         </div>
@@ -75,8 +79,8 @@
 </div>
 <footer class="footer">
   <div class="container">
-    <span>Right-click on Autodesk Hubs <span class="glyphicon glyphicon-time">Versions</span> to send to Box, or on Box Folder <span
-        class="glyphicon glyphicon-file">Files</span> to send to Autodesk.</span>
+    <span>Right-click on <strong>Autodesk Hubs</strong> <span class="glyphicon glyphicon-time">Versions</span> to send to <strong>Egnyte</strong>, or on <strong>Egnyte Folders</strong> <span
+        class="glyphicon glyphicon-file">Files</span> to send to <strong>Autodesk</strong>.</span>
   </div>
 </footer>
 </body>

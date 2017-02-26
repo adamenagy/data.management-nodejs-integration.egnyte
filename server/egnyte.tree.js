@@ -28,20 +28,33 @@ var router = express.Router();
 // config information, such as client ID and secret
 var config = require('./config');
 
-// box sdk: https://github.com/box/box-node-sdk/
-var BoxSDK = require('box-node-sdk');
-
 var egnyteSDK = require('egnyte-js-sdk');
 var request = require('request');
 
+
+// return name & picture of the user for the front-end
+// the forge @me endpoint returns more information
+router.get('/egnyte/profile', function (req, res) {
+  var tokenSession = new token(req.session);
+
+  var egnyte = egnyteSDK.init("https://autodesktesting.egnyte.com", {
+    token: tokenSession.getEgnyteToken()
+  });
+
+  egnyte.API.auth.getUserInfo()
+      .then(function (data) {
+        var profile = {
+          'name': data.first_name + ' ' + data.last_name,
+          'picture': ""
+        };
+        res.end(JSON.stringify(profile));
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+});
+
 router.get('/egnyte/authenticate', function (req, res) {
-  /*
-  var url =
-    'https://account.box.com/api/oauth2/authorize?response_type=code&' +
-    '&client_id=' + config.egnyte.credentials.client_id +
-    '&redirect_uri=' + config.egnyte.callbackURL +
-    '&state=autodeskforge';
-*/
 
   // sample request:
   // https://apidemo.egnyte.com/puboauth/token?client_id=x2g35g8gynb5cedas649m4h4
@@ -59,7 +72,7 @@ router.get('/egnyte/authenticate', function (req, res) {
   res.end(url);
 });
 
-// wait for box callback (oAuth callback)
+// wait for Egnyte callback (oAuth callback)
 router.get('/api/egnyte/callback/oauth', function (req, res) {
   var code = req.query.code;
   var tokenSession = new token(req.session);
@@ -115,8 +128,8 @@ router.get('/egnyte/getTreeNode', function (req, res) {
 
   try {
       var path = req.query.id === '#' ? '/' : req.query.id;
-      var root = egnyte.API.storage.path(path);
-      root.get()
+      var pathInfo = egnyte.API.storage.path(path);
+      pathInfo.get()
           .then(function (data) {
               var result = prepareArraysForJSTree(data.folders, data.files);
               res.end(result);
