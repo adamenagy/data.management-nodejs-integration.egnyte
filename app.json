@@ -29,7 +29,7 @@
     },
     "EGNYTE_CALLBACK_URL": {
       "description": "Redirect URI of your Egnyte app, required for 3-legged OAuth",
-      "value": "https://<<YOUR HEROKU APP NAME HERE>>.herokuapp.com/api/box/callback/oauth"
+      "value": "https://<<YOUR HEROKU APP NAME HERE>>.herokuapp.com/api/egnyte/callback/oauth"
     }
   },
   "website": "https://developer.autodesk.com/",
