@@ -1,7 +1,7 @@
 {
-  "name": "DataManagement.Box.Integration",
-  "description": "Basic integration between Data Management API & Box",
-  "repository": "https://github.com/autodesk-forge/data.management-nodejs-integration.box",
+  "name": "DataManagement.Egnyte.Integration",
+  "description": "Basic integration between Forge & Egnyte",
+  "repository": "https://github.com/adamenagy/data.management-nodejs-integration.egnyte",
   "logo": "https://avatars0.githubusercontent.com/u/8017462?v=3&s=200",
   "keywords": [
     "express",
@@ -21,14 +21,14 @@
       "description": "Callback URL of your Forge app, required for 3-legged OAuth",
       "value": "https://<<YOUR HEROKU APP NAME HERE>>.herokuapp.com/api/forge/callback/oauth"
     },
-    "BOX_CLIENT_ID": {
-      "description": "Box Client ID"
+    "EGNYTE_CLIENT_ID": {
+      "description": "Egnyte Client ID"
     },
-    "BOX_CLIENT_SECRET": {
-      "description": "Box Client Secret"
+    "EGNYTE_CLIENT_SECRET": {
+      "description": "Egnyte Client Secret"
     },
-    "BOX_CALLBACK_URL": {
-      "description": "Redirect URI of your Box app, required for 3-legged OAuth",
+    "EGNYTE_CALLBACK_URL": {
+      "description": "Redirect URI of your Egnyte app, required for 3-legged OAuth",
       "value": "https://<<YOUR HEROKU APP NAME HERE>>.herokuapp.com/api/box/callback/oauth"
     }
   },
