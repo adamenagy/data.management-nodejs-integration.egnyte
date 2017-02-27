@@ -18,13 +18,12 @@ This sample show a simple integration [Data Management API](https://developer.au
 
 ### Live version
 
-See it live at [forgedmboxintegration.herokuapp.com/](https://forgedmboxintegration.herokuapp.com/). 
 
 # Setup
 
 For using this sample, you need an Autodesk developer credentials. Visit the [Forge Developer Portal](https://developer.autodesk.com), sign up for an account, then [create an app](https://developer.autodesk.com/myapps/create). For this new app, use <b>http://localhost:3000/api/forge/callback/oauth</b> as Callback URL. Finally take note of the <b>Client ID</b> and <b>Client Secret</b>.
 
-You also need a Box Developer credentials. Visit the [Box Developer](https://developer.box.com), Log in or Sign up, follow the steps to [Create a Box Application](https://app.box.com/developers/services/edit/). For this new app, use <b>http://localhost:3000/api/box/callback/oauth</b> as redirect_uri. Finally, take note of the <b>client_id</b> and <b>client_secret</b>.
+You also need an Egnyte Developer credentials. Visit the [Egnyte Developer](https://developers.egnyte.com), Log in or Sign up, follow the steps to an Egnyte application. For this new app, use <b>http://localhost:3000/api/box/callback/oauth</b> as redirect_uri. Finally, take note of the <b>client_id</b> and <b>client_secret</b>.
 
 ### Run locally
 
@@ -32,7 +31,7 @@ Install [NodeJS](https://nodejs.org).
 
 Clone this project or download it. It's recommended to install [GitHub desktop](https://desktop.github.com/). To clone it via command line, use the following (<b>Terminal</b> on MacOSX/Linux, <b>Git Shell</b> on Windows):
 
-    git clone https://github.com/autodesk-forge/data.management-nodejs-integration.box
+    git clone https://github.com/adamenagy/data.management-nodejs-integration.egnyte
 
 To run it, install the required packages, set the enviroment variables with your client ID & secret and finally start it. Via command line, navigate to the folder where this repository was cloned and use the following:
 
@@ -41,8 +40,8 @@ Mac OSX/Linux (Terminal)
     npm install
     export FORGE_CLIENT_ID=<<YOUR CLIENT ID FROM FORGE DEVELOPER PORTAL>>
     export FORGE_CLIENT_SECRET=<<YOUR FORGE CLIENT SECRET>>
-    export BOX_CLIENT_ID=<<YOUR CLIENT ID FROM BOX DEVELOPER>>
-    export BOX_CLIENT_SECRET=<<YOUR BOX CLIENT SECRET>>
+    export EGNYTE_CLIENT_ID=<<YOUR CLIENT ID FROM EGNYTE DEVELOPER>>
+    export EGNYTE_CLIENT_SECRET=<<YOUR EGNYTE CLIENT SECRET>>
     npm run dev
 
 Windows (use <b>Node.js command line</b> from Start menu)
@@ -50,8 +49,8 @@ Windows (use <b>Node.js command line</b> from Start menu)
     npm install
     set FORGE_CLIENT_ID=<<YOUR CLIENT ID FROM FORGE DEVELOPER PORTAL>>
     set FORGE_CLIENT_SECRET=<<YOUR FORGE CLIENT SECRET>>
-    set BOX_CLIENT_ID=<<YOUR CLIENT ID FROM BOX DEVELOPER>>
-    set BOX_CLIENT_SECRET=<<YOUR BOX CLIENT SECRET>>
+    set EGNYTE_CLIENT_ID=<<YOUR CLIENT ID FROM EGNYTE DEVELOPER>>
+    set EGNYTE_CLIENT_SECRET=<<YOUR EGNYTE CLIENT SECRET>>
     npm run dev
 
 Open the browser: [http://localhost:3000](http://localhost:3000).
@@ -95,5 +94,5 @@ Please see the [LICENSE](LICENSE) file for full details.
 
 ## Written by
 
-Augusto Goncalves (Forge Partner Development)<br />
+Adam Nagy (Forge Partner Development)<br />
 http://forge.autodesk.com<br />
