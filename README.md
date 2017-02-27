@@ -1,4 +1,4 @@
-# data.management-nodejs-integration.box
+# data.management-nodejs-integration.egnyte
 
 [![Node.js](https://img.shields.io/badge/Node.js-4.4.3-blue.svg)](https://nodejs.org/)
 [![npm](https://img.shields.io/badge/npm-2.15.1-blue.svg)](https://www.npmjs.com/)
@@ -12,7 +12,7 @@
 
 # Description
 
-This sample show a simple integration [Data Management API](https://developer.autodesk.com/en/docs/data/v2/overview/) and [Box](https://www.box.com/about-us). The front-end will look like:
+This sample show a simple integration [Data Management API](https://developer.autodesk.com/en/docs/data/v2/overview/) and [Egnyte](https://www.egnyte.com/about-us). The front-end will look like:
   
 ![](www/img/indexpage.png)
 

@@ -1,5 +1,5 @@
 {
-  "name": "DataManagement.Egnyte.Integration",
+  "name": "Forge.Egnyte.Integration",
   "description": "Basic integration between Forge & Egnyte",
   "repository": "https://github.com/adamenagy/data.management-nodejs-integration.egnyte",
   "logo": "https://avatars0.githubusercontent.com/u/8017462?v=3&s=200",
