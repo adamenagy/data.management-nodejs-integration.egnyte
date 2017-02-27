@@ -232,7 +232,7 @@ function createNewItemOrVersion(projectId, folderId, fileName, objectId) {
                 if (item) {
                     // We found it so we should create a new version
 
-                    projects.postVersion(projectId, JSON.stringify(versionSpecData(fileName, item.id, objectId)))
+                    projects.postVersion(projectId, JSON.stringify(versionSpecData(fileName, projectId, item.id, objectId)))
                         .then(function (versionData) {
                             _resolve(versionData.data.id);
                         })
@@ -244,7 +244,7 @@ function createNewItemOrVersion(projectId, folderId, fileName, objectId) {
                 } else {
                     // We did not find it so we should create it
 
-                    projects.postItem(projectId, JSON.stringify(itemSpecData(fileName, folderId, objectId)))
+                    projects.postItem(projectId, JSON.stringify(itemSpecData(fileName, projectId, folderId, objectId)))
                         .then(function (itemData) {
                             // Get the versionId out of the reply
                             _resolve(itemData.included[0].id);
@@ -357,7 +357,9 @@ function storageSpecData(fileName, folderId) {
     return storageSpecs;
 }
 
-function itemSpecData(fileName, folderId, objectId) {
+function itemSpecData(fileName, projectId, folderId, objectId) {
+    var itemsType = projectId.startsWith("a.") ? "items:autodesk.core:File" : "items:autodesk.bim360:File";
+    var versionsType = projectId.startsWith("a.") ? "versions:autodesk.core:File" : "versions:autodesk.bim360:File";
     var itemSpec = {
         jsonapi: {
             version: "1.0"
@@ -367,7 +369,7 @@ function itemSpecData(fileName, folderId, objectId) {
             attributes: {
                 displayName: fileName,
                 extension: {
-                    type: "items:autodesk.core:File",
+                    type: itemsType,
                     version: "1.0"
                 }
             },
@@ -392,7 +394,7 @@ function itemSpecData(fileName, folderId, objectId) {
             attributes: {
                 name: fileName,
                 extension: {
-                    type: "versions:autodesk.core:File",
+                    type: versionsType,
                     version: "1.0"
                 }
             },
@@ -418,7 +420,9 @@ function itemSpecData(fileName, folderId, objectId) {
     return itemSpec;
 }
 
-function versionSpecData(fileName, itemId, objectId) {
+function versionSpecData(fileName, projectId, itemId, objectId) {
+    var versionsType = projectId.startsWith("a.") ? "versions:autodesk.core:File" : "versions:autodesk.bim360:File";
+
     var versionSpec = {
         "jsonapi": {
             "version": "1.0"
@@ -428,7 +432,7 @@ function versionSpecData(fileName, itemId, objectId) {
             "attributes": {
                 "name": fileName,
                 "extension": {
-                    "type": "versions:autodesk.core:File",
+                    "type": versionsType,
                     "version": "1.0"
                 }
             },
