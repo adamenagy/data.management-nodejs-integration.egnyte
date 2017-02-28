@@ -42,6 +42,10 @@ Token.prototype.isAuthorized = function () {
   return (this._session.tokenpublic != null);
 };
 
+
+
+
+
 // Egnyte token handling
 
 Token.prototype.getEgnyteToken = function () {

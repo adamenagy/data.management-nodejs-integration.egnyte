@@ -210,6 +210,14 @@ function uploadFile(projectId, folderId, fileName, fileSize, fileData) {
     });
 }
 
+function withoutExtension(fileName) {
+    // Remove the last ".<extension>"
+    // e.g.:
+    // my.file.jpg >> my.file
+    // myfile >> myfile
+    return fileName.replace(/(.*)\.(.*?)$/, "$1");
+}
+
 function createNewItemOrVersion(projectId, folderId, fileName, objectId) {
     return new Promise(function (_resolve, _reject) {
 
@@ -220,7 +228,9 @@ function createNewItemOrVersion(projectId, folderId, fileName, objectId) {
                 var item = null;
                 for (var key in folderData.data) {
                     item = folderData.data[key];
-                    if (item.attributes.displayName === fileName) {
+                    // Sometimes the item's displayName does not include the extension
+                    // but its version will!!
+                    if (item.attributes.displayName === fileName || item.attributes.displayName === withoutExtension(fileName)) {
                         break;
                     } else {
                         item = null;
