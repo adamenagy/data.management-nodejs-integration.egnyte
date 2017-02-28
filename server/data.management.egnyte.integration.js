@@ -30,13 +30,20 @@ var jsonParser = bodyParser.json();
 // config information, such as client ID and secret
 var config = require('./config');
 
-// forge 
-var forgeDM = require('forge-data-management');
-var forgeOSS = require('forge-oss');
+// forge
+var forgeSDK = require('forge-apis');
 
 var request = require('request');
 
 var egnyteSDK = require('egnyte-js-sdk');
+
+function respondWithError(res, error) {
+    if (error.statusCode) {
+        res.status(error.statusCode).end(error.statusMessage);
+    } else {
+        res.status(500).end(error.message);
+    }
+}
 
 router.post('/integration/sendToEgnyte', jsonParser, function (req, res) {
     var tokenSession = new token(req.session);
@@ -44,10 +51,6 @@ router.post('/integration/sendToEgnyte', jsonParser, function (req, res) {
         res.status(401).json({error: 'Please login first'});
         return;
     }
-    // Configure OAuth2 access token for authorization: oauth2_access_code
-    var defaultClient = forgeDM.ApiClient.instance;
-    var oauth = defaultClient.authentications ['oauth2_access_code'];
-    oauth.accessToken = tokenSession.getTokenInternal();
 
     // file IDs to transfer
     var autodeskFileId = decodeURIComponent(req.body.autodeskfile);
@@ -59,82 +62,75 @@ router.post('/integration/sendToEgnyte', jsonParser, function (req, res) {
     var projectId = params[params.length - 3];
     var versionId = params[params.length - 1];
 
-    var versions = new forgeDM.VersionsApi();
-    versions.getVersion(projectId, versionId).then(function (version) {
-        if (!version.data.relationships.storage || !version.data.relationships.storage.meta.link.href) {
-            res.status(500).json({error: 'No storage defined, cannot transfer.'});
-            return;
-        }
-        var storageLocation = version.data.relationships.storage.meta.link.href;
-        // the storage location should be in the form of
-        // /oss/v2/buckets/::bucketKey::/objects/::objectName::
-        params = storageLocation.split('/');
-        var bucketKey = params[params.length - 3];
-        var objectName = params[params.length - 1];
-
-        var defaultOSSClient = forgeOSS.ApiClient.instance;
-        var oauthOSS = defaultOSSClient.authentications ['oauth2_application']; // not the 'oauth2_access_code', as per documentation
-        oauthOSS.accessToken = tokenSession.getTokenInternal();
-        var objects = new forgeOSS.ObjectsApi();
-
-        // npm forge-oss call to download not working
-        //objects.getObject(bucketKey, objectName).then(function (file) {
-
-        // workaround to download
-        request({
-            url: storageLocation,
-            method: "GET",
-            headers: {
-                'Authorization': 'Bearer ' + tokenSession.getTokenInternal(),
-            },
-            encoding: null
-        }, function (error, response, file) {
-            if (error) {
-                console.log(error);
-                res.status(error.statusCode).end(error.statusMessage);
+    var versions = new forgeSDK.VersionsApi();
+    versions.getVersion(projectId, versionId, tokenSession.getInternalOAuth(), tokenSession.getInternalCredentials())
+        .then(function (version) {
+            if (!version.body.data.relationships.storage || !version.body.data.relationships.storage.meta.link.href) {
+                res.status(500).json({error: 'No storage defined, cannot transfer.'});
                 return;
             }
-            // end of workaround
+            var storageLocation = version.body.data.relationships.storage.meta.link.href;
+            // the storage location should be in the form of
+            // /oss/v2/buckets/::bucketKey::/objects/::objectName::
+            params = storageLocation.split('/');
+            var bucketKey = params[params.length - 3];
+            var objectName = params[params.length - 1];
 
-            var egnyte = egnyteSDK.init("https://autodesktesting.egnyte.com", {
-                token: tokenSession.getEgnyteToken()
-            });
+            //var objects = new forgeOSS.ObjectsApi();
+            // npm forge-oss call to download not working
+            //objects.getObject(bucketKey, objectName).then(function (file) {
 
-            var fileName = version.data.attributes.name;
-
-            /*
-            var pathInfo = egnyte.API.storage.path(egnyteFolderId + "/" + fileName);
-            pathInfo.storeFile(file)
-                .then(function (data) {
-                    res.json({ result: "OK", file: fileName });
-                })
-                .catch(function (error) {
-                    res.status(error.statusCode).end(error.statusMessage);
-                });
-            */
+            // workaround to download
             request({
-                url:  'https://autodesktesting.egnyte.com/pubapi/v1/fs-content/' + egnyteFolderId + "/" + fileName,
-                method: "POST",
+                url: storageLocation,
+                method: "GET",
                 headers: {
-                    'Authorization': 'Bearer ' + tokenSession.getEgnyteToken(),
+                    'Authorization': 'Bearer ' + tokenSession.getInternalCredentials().access_token
                 },
-                encoding: null,
-                body: file
+                encoding: null
             }, function (error, response, file) {
                 if (error) {
                     console.log(error);
-                    res.status(error.statusCode).end(error.statusMessage);
+                    respondWithError(res, error);
                     return;
                 }
+                // end of workaround
 
-                res.json({ result: "OK", file: fileName });
+                var egnyte = egnyteSDK.init("https://autodesktesting.egnyte.com", {
+                    token: tokenSession.getEgnyteToken()
+                });
+
+                var fileName = version.body.data.attributes.name;
+
+                /*
+                 var pathInfo = egnyte.API.storage.path(egnyteFolderId + "/" + fileName);
+                 pathInfo.storeFile(file)
+                 .then(function (data) {
+                 res.json({ result: "OK", file: fileName });
+                 })
+                 .catch(function (error) {
+                 respondWithError(res, error);
+                 });
+                 */
+                request({
+                    url: 'https://autodesktesting.egnyte.com/pubapi/v1/fs-content/' + egnyteFolderId + "/" + fileName,
+                    method: "POST",
+                    headers: {
+                        'Authorization': 'Bearer ' + tokenSession.getEgnyteToken(),
+                    },
+                    encoding: null,
+                    body: file
+                }, function (error, response, file) {
+                    if (error) {
+                        console.log(error);
+                        respondWithError(res, error);
+                        return;
+                    }
+
+                    res.json({result: "OK", file: fileName});
+                });
             });
-
-
-        });
-
-        //.catch(function (e) { res.status(e.error.statusCode).json({error: e.error.body}) });
-    }).catch(function (e) {
+        }).catch(function (e) {
         res.status(e.error.statusCode).json({error: e.error.body})
     });
 });
@@ -145,16 +141,6 @@ router.post('/integration/sendToAutodesk', jsonParser, function (req, res) {
         res.status(401).json({error: 'Please login first'});
         return;
     }
-    // Configure OAuth2 access token for authorization: oauth2_access_code
-    var defaultClient = forgeDM.ApiClient.instance;
-    defaultClient.authentications ['oauth2_access_code'].accessToken = tokenSession.getTokenInternal();
-    defaultClient.authentications ['oauth2_application'].accessToken = tokenSession.getTokenInternal();
-
-    var defaultClient = forgeOSS.ApiClient.instance;
-    defaultClient.authentications ['oauth2_access_code'].accessToken = tokenSession.getTokenInternal();
-    defaultClient.authentications ['oauth2_application'].accessToken = tokenSession.getTokenInternal();
-
-    var projects = new forgeDM.ProjectsApi();
 
     // file IDs to transfer
     var autodeskType = req.body.autodesktype; // projects or folders
@@ -173,40 +159,50 @@ router.post('/integration/sendToAutodesk', jsonParser, function (req, res) {
         case "projects":
             projectId = params[params.length - 1];
             var hubId = params[params.length - 3];
-            projects.getProject(hubId, projectId).then(function (project) {
-                folderId = project.data.relationships.rootFolder.data.id;
-                sendToAutodesk(projectId, folderId, egnyteFileId, res, req);
-            });
+            var projects = new forgeSDK.ProjectsApi();
+            projects.getProject(hubId, projectId,
+                tokenSession.getInternalOAuth(), tokenSession.getInternalCredentials())
+                .then(function (project) {
+                    folderId = project.body.data.relationships.rootFolder.data.id;
+                    sendToAutodesk(projectId, folderId, egnyteFileId, res, req);
+                });
             break;
     }
 });
 
-function uploadFile(projectId, folderId, fileName, fileSize, fileData) {
+function uploadFile(projectId, folderId, fileName, fileSize, fileData, req) {
     return new Promise(function (_resolve, _reject) {
-        // Ask for storage for the new file we want to upload
-        var projects = new forgeDM.ProjectsApi();
-        projects.postStorage(projectId, JSON.stringify(storageSpecData(fileName, folderId)))
-            .then(function (storageData) {
-                var objectId = storageData.data.id;
-                var bucketKeyObjectName = getBucketKeyObjectName(objectId);
+        try {
+            // Ask for storage for the new file we want to upload
+            var tokenSession = new token(req.session);
+            var projects = new forgeSDK.ProjectsApi();
+            projects.postStorage(projectId, JSON.stringify(storageSpecData(fileName, folderId)),
+                tokenSession.getInternalOAuth(), tokenSession.getInternalCredentials())
+                .then(function (storageData) {
+                    var objectId = storageData.body.data.id;
+                    var bucketKeyObjectName = getBucketKeyObjectName(objectId);
 
+                    // Upload the new file
+                    var objects = new forgeSDK.ObjectsApi();
+                    objects.uploadObject(
+                        bucketKeyObjectName.bucketKey, bucketKeyObjectName.objectName, fileSize, fileData,
+                        {}, tokenSession.getInternalOAuth(), tokenSession.getInternalCredentials())
+                        .then(function (objectData) {
+                            console.log('uploadObject: succeeded');
+                            _resolve(objectData.body.objectId);
+                        })
+                        .catch(function (error) {
+                            console.log('uploadObject: failed');
+                            _reject(error);
+                        });
 
-                // Upload the new file
-                var objects = new forgeOSS.ObjectsApi();
-                objects.uploadObject(bucketKeyObjectName.bucketKey, bucketKeyObjectName.objectName, fileSize, fileData)
-                    .then(function (objectData) {
-                        console.log('uploadObject: succeeded');
-                        _resolve(objectData.objectId);
-                    })
-                    .catch(function (error) {
-                        console.log('uploadObject: failed');
-                        _reject(error);
-                    });
-
-            })
-            .catch(function (error) {
-                _reject(error);
-            });
+                })
+                .catch(function (error) {
+                    _reject(error);
+                });
+        } catch (err) {
+            _reject(err);
+        }
     });
 }
 
@@ -218,58 +214,63 @@ function withoutExtension(fileName) {
     return fileName.replace(/(.*)\.(.*?)$/, "$1");
 }
 
-function createNewItemOrVersion(projectId, folderId, fileName, objectId) {
+function createNewItemOrVersion(projectId, folderId, fileName, objectId, req) {
     return new Promise(function (_resolve, _reject) {
+        try {
+            var tokenSession = new token(req.session);
 
-        var folders = new forgeDM.FoldersApi();
-
-        folders.getFolderContents(projectId, folderId)
-            .then(function (folderData) {
-                var item = null;
-                for (var key in folderData.data) {
-                    item = folderData.data[key];
-                    // Sometimes the item's displayName does not include the extension
-                    // but its version will!!
-                    if (item.attributes.displayName === fileName || item.attributes.displayName === withoutExtension(fileName)) {
-                        break;
-                    } else {
-                        item = null;
+            var folders = new forgeSDK.FoldersApi();
+            folders.getFolderContents(projectId, folderId, {},
+                tokenSession.getInternalOAuth(), tokenSession.getInternalCredentials())
+                .then(function (folderData) {
+                    var item = null;
+                    for (var key in folderData.body.data) {
+                        item = folderData.body.data[key];
+                        if (item.attributes.displayName === fileName || item.attributes.displayName === withoutExtension(fileName)) {
+                            break;
+                        } else {
+                            item = null;
+                        }
                     }
-                }
 
-                var projects = new forgeDM.ProjectsApi();
+                    if (item) {
+                        // We found it so we should create a new version
+                        var versions = new forgeSDK.VersionsApi();
+                        var body = JSON.stringify(versionSpecData(fileName, projectId, item.id, objectId));
+                        versions.postVersion(projectId, body,
+                            tokenSession.getInternalOAuth(), tokenSession.getInternalCredentials())
+                            .then(function (versionData) {
+                                _resolve(versionData.body.data.id);
+                            })
+                            .catch(function (error) {
+                                console.log('postVersion: failed');
 
-                if (item) {
-                    // We found it so we should create a new version
+                                _reject(error);
+                            });
+                    } else {
+                        // We did not find it so we should create it
+                        var items = new forgeSDK.ItemsApi();
+                        var body = JSON.stringify(itemSpecData(fileName, projectId, folderId, objectId));
+                        items.postItem(projectId, body,
+                            tokenSession.getInternalOAuth(), tokenSession.getInternalCredentials())
+                            .then(function (itemData) {
+                                // Get the versionId out of the reply
+                                _resolve(itemData.body.included[0].id);
+                            })
+                            .catch(function (error) {
+                                console.log('postItem: failed');
 
-                    projects.postVersion(projectId, JSON.stringify(versionSpecData(fileName, projectId, item.id, objectId)))
-                        .then(function (versionData) {
-                            _resolve(versionData.data.id);
-                        })
-                        .catch(function (error) {
-                            console.log('postVersion: failed');
-
-                            _reject(error);
-                        });
-                } else {
-                    // We did not find it so we should create it
-
-                    projects.postItem(projectId, JSON.stringify(itemSpecData(fileName, projectId, folderId, objectId)))
-                        .then(function (itemData) {
-                            // Get the versionId out of the reply
-                            _resolve(itemData.included[0].id);
-                        })
-                        .catch(function (error) {
-                            console.log('postItem: failed');
-
-                            _reject(error);
-                        });
-                }
-            })
-            .catch(function (error) {
-                console.log('getFolderContents: failed');
-                _reject(error);
-            });
+                                _reject(error);
+                            });
+                    }
+                })
+                .catch(function (error) {
+                    console.log('getFolderContents: failed');
+                    _reject(error);
+                });
+        } catch (err) {
+            _reject(err);
+        }
     });
 }
 
@@ -307,26 +308,30 @@ function sendToAutodesk(projectId, folderId, egnyteFileId, res, req) {
             if (body.errors != null)
                 console.log(body.errors);
 
-            res.status(error.statusCode).end(error.statusMessage);
+            respondWithError(res, error);
 
             return;
         }
 
-        uploadFile(projectId, folderId, fileName, body.length, body)
-            .then(function (objectId) {
-                createNewItemOrVersion(projectId, folderId, fileName, objectId)
-                    .then(function (versionId) {
-                        var str = "";
-                        res.json({result: "OK", file: fileName});
-                    })
-                    .catch(function (error) {
-                        var str = "";
-                        res.status(error.statusCode).end(error.statusMessage);
-                    });
-            })
-            .catch(function (error) {
-                res.status(error.statusCode).end(error.statusMessage);
-            });
+        try {
+            uploadFile(projectId, folderId, fileName, body.length, body, req)
+                .then(function (objectId) {
+                    createNewItemOrVersion(projectId, folderId, fileName, objectId, req)
+                        .then(function (versionId) {
+                            var str = "";
+                            res.json({result: "OK", file: fileName});
+                        })
+                        .catch(function (error) {
+                            var str = "";
+                            respondWithError(res, error);
+                        });
+                })
+                .catch(function (error) {
+                    respondWithError(res, error);
+                });
+        } catch (err) {
+            respondWithError(res, err);
+        }
     });
 }
 
@@ -344,6 +349,7 @@ function getBucketKeyObjectName(objectId) {
         bucketKey: bucketKeyValue,
         objectName: objectNameValue
     };
+
     return ret;
 }
 
@@ -364,6 +370,7 @@ function storageSpecData(fileName, folderId) {
             }
         }
     };
+
     return storageSpecs;
 }
 

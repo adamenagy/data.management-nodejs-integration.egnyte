@@ -20,28 +20,31 @@
 
 module.exports = {
 
-  // Autodesk Forge configuration
+    // Autodesk Forge configuration
 
-  // this this callback URL when creating your client ID and secret
-  callbackURL: process.env.FORGE_CALLBACK_URL || 'http://localhost:3000/api/forge/callback/oauth',
+    // this this callback URL when creating your client ID and secret
+    callbackURL: process.env.FORGE_CALLBACK_URL || 'http://localhost:3000/api/forge/callback/oauth',
 
-  // set enviroment variables or hard-code here
-  credentials: {
-    client_id: process.env.FORGE_CLIENT_ID || '<replace with your consumer key>',
-    client_secret: process.env.FORGE_CLIENT_SECRET || '<replace with your consumer secret>',
-  },
-
-  // Required scopes for your application on server-side
-  scopeInternal: 'data:read data:write data:create data:search bucket:create bucket:read bucket:update bucket:delete',
-  // Required scope of the token sent to the client
-  scopePublic: 'data:read',
-
-  // Egnyte configuration
-  egnyte: {
-    callbackURL: process.env.EGNYTE_CALLBACK_URL || 'http://localhost:3000/api/egnyte/callback/oauth',
+    // set enviroment variables or hard-code here
     credentials: {
-      client_id: process.env.EGNYTE_CLIENT_ID || '<replace with your egnyte client id',
-      client_secret: process.env.EGNYTE_CLIENT_SECRET || '<replace with your egnyte client secret'
+        client_id: process.env.FORGE_CLIENT_ID || '<replace with your consumer key>',
+        client_secret: process.env.FORGE_CLIENT_SECRET || '<replace with your consumer secret>',
+    },
+
+    // Required scopes for your application on server-side
+    scopeInternal: [
+        'data:read', 'data:write', 'data:create', 'data:search',
+        'bucket:create', 'bucket:read', 'bucket:update', 'bucket:delete'
+    ],
+    // Required scope of the token sent to the client
+    scopePublic: ['data:read'],
+
+    // Egnyte configuration
+    egnyte: {
+        callbackURL: process.env.EGNYTE_CALLBACK_URL || 'http://localhost:3000/api/egnyte/callback/oauth',
+        credentials: {
+            client_id: process.env.EGNYTE_CLIENT_ID || '<replace with your egnyte client id',
+            client_secret: process.env.EGNYTE_CLIENT_SECRET || '<replace with your egnyte client secret'
+        }
     }
-  }
 };

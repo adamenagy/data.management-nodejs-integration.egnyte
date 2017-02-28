@@ -31,155 +31,155 @@ var config = require('./config');
 var egnyteSDK = require('egnyte-js-sdk');
 var request = require('request');
 
+function respondWithError(res, error) {
+    if (error.statusCode) {
+        res.status(error.statusCode).end(error.statusMessage);
+    } else {
+        res.status(500).end(error.message);
+    }
+}
 
 // return name & picture of the user for the front-end
 // the forge @me endpoint returns more information
 router.get('/egnyte/profile', function (req, res) {
-  var tokenSession = new token(req.session);
+    var tokenSession = new token(req.session);
 
-  var egnyte = egnyteSDK.init("https://autodesktesting.egnyte.com", {
-    token: tokenSession.getEgnyteToken()
-  });
+    var egnyte = egnyteSDK.init("https://autodesktesting.egnyte.com", {
+        token: tokenSession.getEgnyteToken()
+    });
 
-  egnyte.API.auth.getUserInfo()
-      .then(function (data) {
-        var profile = {
-          'name': data.first_name + ' ' + data.last_name,
-          'picture': ""
-        };
-        res.end(JSON.stringify(profile));
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
+    egnyte.API.auth.getUserInfo()
+        .then(function (data) {
+            var profile = {
+                'name': data.first_name + ' ' + data.last_name,
+                'picture': ""
+            };
+            res.end(JSON.stringify(profile));
+        })
+        .catch(function (error) {
+            console.log(error);
+            respondWithError(res, error);
+        });
 });
 
 router.get('/egnyte/authenticate', function (req, res) {
 
-  // sample request:
-  // https://apidemo.egnyte.com/puboauth/token?client_id=x2g35g8gynb5cedas649m4h4
-  // &client_secret=SECRET_KEY&redirect_uri=https://yourapp.com/oauth
-  // &scope=Egnyte.filesystem&state=apidemo123&response_type=code
+    // sample request:
+    // https://apidemo.egnyte.com/puboauth/token?client_id=x2g35g8gynb5cedas649m4h4
+    // &client_secret=SECRET_KEY&redirect_uri=https://yourapp.com/oauth
+    // &scope=Egnyte.filesystem&state=apidemo123&response_type=code
 
-  var url =
-      'https://autodesktesting.egnyte.com/puboauth/token?' +
-      'client_id=' + config.egnyte.credentials.client_id +
-      '&client_secret=' + config.egnyte.credentials.client_secret +
-      '&redirect_uri=' + config.egnyte.callbackURL +
-      '&scope=Egnyte.filesystem' +
-      '&state=uptomewhatIpasshere' +
-      '&response_type=code'
-  res.end(url);
+    var url =
+        'https://autodesktesting.egnyte.com/puboauth/token?' +
+        'client_id=' + config.egnyte.credentials.client_id +
+        '&client_secret=' + config.egnyte.credentials.client_secret +
+        '&redirect_uri=' + config.egnyte.callbackURL +
+        '&scope=Egnyte.filesystem' +
+        '&state=uptomewhatIpasshere' +
+        '&response_type=code'
+    res.end(url);
 });
 
 // wait for Egnyte callback (oAuth callback)
 router.get('/api/egnyte/callback/oauth', function (req, res) {
-  var code = req.query.code;
-  var tokenSession = new token(req.session);
+    var code = req.query.code;
+    var tokenSession = new token(req.session);
 
-  request({
-    url: "https://autodesktesting.egnyte.com/puboauth/token",
-    method: "POST",
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
-    },
-    body:
-      'client_id=' + config.egnyte.credentials.client_id +
-      '&client_secret=' + config.egnyte.credentials.client_secret +
-      '&redirect_uri=' + config.egnyte.callbackURL +
-      '&code=' + code +
-      '&grant_type=authorization_code'
-  }, function (error, response, body) {
-    if (error != null) {
-      console.log(error); // connection problems
+    request({
+        url: "https://autodesktesting.egnyte.com/puboauth/token",
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: 'client_id=' + config.egnyte.credentials.client_id +
+        '&client_secret=' + config.egnyte.credentials.client_secret +
+        '&redirect_uri=' + config.egnyte.callbackURL +
+        '&code=' + code +
+        '&grant_type=authorization_code'
+    }, function (error, response, body) {
+        if (error != null) {
+            console.log(error); // connection problems
 
-      if (body.errors != null)
-        console.log(body.errors);
+            if (body.errors != null)
+                console.log(body.errors);
 
-      res.status(error.statusCode).end(error.statusMessage);
+            respondWithError(res, error);
 
-      return;
-    }
+            return;
+        }
 
-    var json = JSON.parse(body);
-    tokenSession.setEgnyteToken(json.access_token);
+        var json = JSON.parse(body);
+        tokenSession.setEgnyteToken(json.access_token);
 
-    res.redirect('/');
-  })
+        res.redirect('/');
+    })
 });
 
 // return the public token of the current user
 // the public token should have a limited scope (read-only)
 router.get('/egnyte/isAuthorized', function (req, res) {
-  var tokenSession = new token(req.session);
-  res.end(tokenSession.isEgnyteAuthorized() ? 'true' : 'false');
+    var tokenSession = new token(req.session);
+    res.end(tokenSession.isEgnyteAuthorized() ? 'true' : 'false');
 });
 
 router.get('/egnyte/getTreeNode', function (req, res) {
-  var tokenSession = new token(req.session);
-  if (!tokenSession.isEgnyteAuthorized()) {
-    res.status(401).end('Please box login first');
-    return;
-  }
+    var tokenSession = new token(req.session);
+    if (!tokenSession.isEgnyteAuthorized()) {
+        res.status(401).end('Please box login first');
+        return;
+    }
 
-  var egnyte = egnyteSDK.init("https://autodesktesting.egnyte.com", {
-    token: tokenSession.getEgnyteToken()
-  });
+    var egnyte = egnyteSDK.init("https://autodesktesting.egnyte.com", {
+        token: tokenSession.getEgnyteToken()
+    });
 
-  try {
-      var path = req.query.id === '#' ? '/' : req.query.id;
-      var pathInfo = egnyte.API.storage.path(path);
-      pathInfo.get()
-          .then(function (data) {
-              var result = prepareArraysForJSTree(data.folders, data.files);
-              res.end(result);
-          })
-          .catch(function (error) {
-              res.status(error.statusCode).end(error.statusMessage);
-          });
-  } catch (err) {
-      res.status(500).end(err.message);
-  }
-  /*
-  var box = sdk.getBasicClient(tokenSession.getBoxToken());
-
-  var id = (req.query.id === '#' ? '0' : req.query.id);
-  box.folders.getItems(id, {fields: 'name,shared_link,permissions,collections,sync_state'}, function (err, data) {
-    res.end(prepareArrayForJSTree(data.entries));
-  });*/
+    try {
+        var path = req.query.id === '#' ? '/' : req.query.id;
+        var pathInfo = egnyte.API.storage.path(path);
+        pathInfo.get()
+            .then(function (data) {
+                var result = prepareArraysForJSTree(data.folders, data.files);
+                res.end(result);
+            })
+            .catch(function (error) {
+                respondWithError(res, error);
+            });
+    } catch (err) {
+        respondWithError(res, err)
+    }
 });
 
 // Formats a list to JSTree structure
 function prepareArraysForJSTree(folders, files) {
-  var treeList = [];
+    var treeList = [];
 
-  if (folders) {
-    folders.forEach(function (item, index) {
-      //console.log(item);
-      var treeItem = {
-        id: item.path,
-        text: item.name,
-        type: item.is_folder ? 'folder' : 'file',
-        children: item.is_folder
-      };
-      treeList.push(treeItem);
-    });
-  }
+    if (folders) {
+        folders.forEach(function (item, index) {
+            //console.log(item);
+            var treeItem = {
+                id: item.path,
+                text: item.name,
+                type: item.is_folder ? 'folder' : 'file',
+                children: item.is_folder
+            };
+            treeList.push(treeItem);
+        });
+    }
 
-  if (files) {
-    files.forEach(function (item, index) {
-      //console.log(item);
-      var treeItem = {
-        id: item.path,
-        text: item.name,
-        type: item.is_folder ? 'folder' : 'file',
-        children: item.is_folder
-      };
-      treeList.push(treeItem);
-    });
-  }
+    if (files) {
+        files.forEach(function (item, index) {
+            //console.log(item);
+            var treeItem = {
+                id: item.path,
+                text: item.name,
+                type: item.is_folder ? 'folder' : 'file',
+                children: item.is_folder
+            };
+            treeList.push(treeItem);
+        });
+    }
 
-  return JSON.stringify(treeList);
+    return JSON.stringify(treeList);
 }
 
 module.exports = router;

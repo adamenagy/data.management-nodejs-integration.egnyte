@@ -26,24 +26,23 @@ var express = require('express');
 var router = express.Router();
 
 // forge
-var ForgeModelDerivative = require('forge-model-derivative');
+var forgeSDK = require('forge-apis');
 
 router.get('/md/formats', function (req, res) {
-  var tokenSession = new token(req.session);
-  if (!tokenSession.isAuthorized()) {
-    res.status(401).end('Please login first');
-    return;
-  }
+    var tokenSession = new token(req.session);
+    if (!tokenSession.isAuthorized()) {
+        res.status(401).end('Please login first');
+        return;
+    }
 
-  // Configure OAuth2 access token for authorization: oauth2_access_code
-  var defaultClient = ForgeModelDerivative.ApiClient.instance;
-  var oauth = defaultClient.authentications ['oauth2_access_code'];
-  oauth.accessToken = tokenSession.getTokenInternal();
-
-  var derivative = new ForgeModelDerivative.DerivativesApi();
-  derivative.getFormats(null).then(function(formats){
-    res.status(200).json(formats.formats.svf);
-  })
+    var derivatives = new forgeSDK.DerivativesApi();
+    derivatives.getFormats({}, tokenSession.getInternalOAuth(), tokenSession.getInternalCredentials())
+        .then(function (formats) {
+            res.json(formats.body.formats.svf);
+        })
+        .catch(function (error) {
+            respondWithError(res, error);
+        });
 });
 
 module.exports = router;
