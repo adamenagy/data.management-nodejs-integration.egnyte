@@ -17,24 +17,25 @@
 /////////////////////////////////////////////////////////////////////
 
 $(document).ready(function () {
+    isEgnyteAuthorized(function (isAuthorized) {
+        if (!isAuthorized) {
+            $('#refreshEgnyteTree').hide();
+            $('#loginEgnyte').click(egnyteLogin);
+        } else {
+            getEgnyteUserProfile(function (profile) {
+                $('#loginEgnyteText').text(profile.name);
+            });
 
-    if (!isEgnyteAuthorized()) {
-        $('#refreshEgnyteTree').hide();
-        $('#loginEgnyte').click(egnyteSignIn);
-    } else {
-        getEgnyteUserProfile(function (profile) {
-            $('#loginEgnyteText').text(profile.name);
-        });
-
-        $('#refreshEgnyteTree').show();
-        $('#refreshEgnyteTree').click(function () {
-            $('#myEgnyteFiles').jstree(true).refresh();
-        });
-        prepareEgnyteTree();
-    }
+            $('#refreshEgnyteTree').show();
+            $('#refreshEgnyteTree').click(function () {
+                $('#myEgnyteFiles').jstree(true).refresh();
+            });
+            prepareEgnyteTree();
+        }
+    })
 });
 
-function egnyteSignIn() {
+function egnyteLogin() {
     jQuery.ajax({
         url: '/egnyte/authenticate',
         success: function (rootUrl) {
@@ -43,16 +44,17 @@ function egnyteSignIn() {
     });
 }
 
-function isEgnyteAuthorized() {
+function isEgnyteAuthorized(callback) {
     var ret = 'false';
     jQuery.ajax({
         url: '/egnyte/isAuthorized',
         success: function (res) {
-            ret = res;
+            callback(res === 'true');
         },
-        async: false
+        error: function (err) {
+            callback(false);
+        }
     });
-    return (ret === 'true');
 }
 
 function prepareEgnyteTree() {
@@ -99,6 +101,7 @@ function egnyteCustomMenu(node) {
             }
         };
     }
+
     return items;
 }
 
@@ -115,7 +118,10 @@ function sendToAutodesk(egnyteNode, autodeskNode) {
             $.notify('File "' + egnyteNode.text + '" cannot be translated to Forge Viewer', 'warn');
         }
 
-        $.notify('Preparing to send file "' + egnyteNode.text + '" to "' + autodeskNode.text + '" Autodesk ' + autodeskNode.type, 'info');
+        $.notify(
+            'Preparing to send file "' + egnyteNode.text + '" to "' + autodeskNode.text + '" Autodesk ' +
+            autodeskNode.type, 'info'
+        );
 
         jQuery.ajax({
             url: '/integration/sendToAutodesk',
@@ -135,7 +141,6 @@ function sendToAutodesk(egnyteNode, autodeskNode) {
                 $.notify(res, 'error');
             }
         });
-
     });
 }
 

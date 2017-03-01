@@ -115,8 +115,6 @@ router.get('/api/egnyte/callback/oauth', function (req, res) {
     })
 });
 
-// return the public token of the current user
-// the public token should have a limited scope (read-only)
 router.get('/egnyte/isAuthorized', function (req, res) {
     var tokenSession = new token(req.session);
     res.end(tokenSession.isEgnyteAuthorized() ? 'true' : 'false');

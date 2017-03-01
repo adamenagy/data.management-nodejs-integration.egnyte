@@ -18,13 +18,27 @@
 
 $(document).ready(function () {
     $('#refreshAutodeskTree').hide();
-    if (getForgeToken() != '') {
-        prepareDataManagementTree();
-        $('#refreshAutodeskTree').show();
-        $('#refreshAutodeskTree').click(function () {
-            $('#myAutodeskFiles').jstree(true).refresh();
-        });
-    }
+
+    getForgeToken(function (token) {
+        if (token === '') {
+            $('#loginAutodesk').click(forgeLogin);
+        } else {
+            $('#refreshAutodeskTree').show();
+            $('#refreshAutodeskTree').click(function () {
+                $('#myAutodeskFiles').jstree(true).refresh();
+            });
+
+            getForgeUserProfile(function (profile) {
+                $('#loginAutodeskProfileImage').removeClass(); // remove glyphicon-user
+                $('#loginAutodeskProfileImage').html('<img src="' + profile.picture + '"/>')
+                $('#loginAutodeskText').text(profile.name);
+                $('#loginAutodeskText').attr('title', 'Click to forgeLogoff');
+                $('#loginAutodesk').click(forgeLogoff);
+            });
+
+            prepareDataManagementTree();
+        }
+    });
 });
 
 function prepareDataManagementTree() {
@@ -92,7 +106,10 @@ function sendToEgnyte(autodeskNode, egnyteNode) {
         $.notify('Please select a folder on Egnyte Folders', 'error');
         return;
     }
-    $.notify('Preparing to send file "' + autodeskNode.text + '" to "' + egnyteNode.text + '" Egnyte ' + egnyteNode.type, 'info');
+    $.notify(
+        'Preparing to send file "' + autodeskNode.text + '" to "' + egnyteNode.text +
+        '" Egnyte ' + egnyteNode.type, 'info'
+    );
 
     jQuery.ajax({
         url: '/integration/sendToEgnyte',
@@ -109,6 +126,49 @@ function sendToEgnyte(autodeskNode, egnyteNode) {
         },
         error: function (res) {
             $.notify(res, 'error');
+        }
+    });
+}
+
+function forgeLogin() {
+    jQuery.ajax({
+        url: '/user/authenticate',
+        success: function (rootUrl) {
+            location.href = rootUrl;
+        }
+    });
+}
+
+function forgeLogoff() {
+    jQuery.ajax({
+        url: '/user/forgeLogoff',
+        success: function (oauthUrl) {
+            location.href = oauthUrl;
+        }
+    });
+}
+
+function getForgeToken(callback) {
+    jQuery.ajax({
+        url: '/user/token',
+        success: function (token) {
+            if (token != '')
+                console.log('3 legged token (User Authorization): ' + token); // debug
+
+            callback(token);
+        },
+        error: function (err) {
+            callback('');
+        }
+    });
+}
+
+function getForgeUserProfile(onsuccess) {
+    var profile = '';
+    jQuery.ajax({
+        url: '/user/profile',
+        success: function (profile) {
+            onsuccess(profile);
         }
     });
 }

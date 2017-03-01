@@ -130,9 +130,10 @@ router.post('/integration/sendToEgnyte', jsonParser, function (req, res) {
                     res.json({result: "OK", file: fileName});
                 });
             });
-        }).catch(function (e) {
-        res.status(e.error.statusCode).json({error: e.error.body})
-    });
+        })
+        .catch(function (err) {
+            respondWithError(res, err);
+        });
 });
 
 router.post('/integration/sendToAutodesk', jsonParser, function (req, res) {
