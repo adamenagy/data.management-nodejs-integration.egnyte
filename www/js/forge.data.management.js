@@ -125,7 +125,7 @@ function sendToEgnyte(autodeskNode, egnyteNode) {
             $('#myEgnyteFiles').jstree(true).refresh_node(egnyteNode);
         },
         error: function (res) {
-            $.notify(res, 'error');
+            $.notify(res.responseText, 'error');
         }
     });
 }

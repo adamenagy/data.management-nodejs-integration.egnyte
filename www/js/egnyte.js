@@ -138,7 +138,7 @@ function sendToAutodesk(egnyteNode, autodeskNode) {
                 $('#myAutodeskFiles').jstree(true).refresh_node(autodeskNode);
             },
             error: function (res) {
-                $.notify(res, 'error');
+                $.notify(res.responseText, 'error');
             }
         });
     });
