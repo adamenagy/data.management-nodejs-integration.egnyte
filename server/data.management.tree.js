@@ -137,6 +137,11 @@ function prepareArrayForJSTree(listOf, canHaveChildren, data) {
     if (listOf == null) return '';
     var treeList = [];
     listOf.forEach(function (item, index) {
+        console.log(item.links.self.href);
+        console.log(
+            "item.attributes.displayName = " + item.attributes.displayName +
+            "; item.attributes.name = " + item.attributes.name
+        );
         var treeItem = {
             id: item.links.self.href,
             data: (item.relationships != null && item.relationships.derivatives != null ?
