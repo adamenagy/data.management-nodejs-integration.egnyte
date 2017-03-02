@@ -12,7 +12,7 @@
 
 # Description
 
-This sample show a simple integration [Data Management API](https://developer.autodesk.com/en/docs/data/v2/overview/) and [Egnyte](https://www.egnyte.com/about-us). The front-end will look like:
+This sample show a simple integration [Data Management API](https://developer.autodesk.com/en/docs/data/v2/overview/) and [Egnyte](https://www.egnyte.com). The front-end will look like:
   
 ![](www/img/indexpage.png)
 
@@ -24,6 +24,8 @@ This sample show a simple integration [Data Management API](https://developer.au
 For using this sample, you need an Autodesk developer credentials. Visit the [Forge Developer Portal](https://developer.autodesk.com), sign up for an account, then [create an app](https://developer.autodesk.com/myapps/create). For this new app, use <b>http://localhost:3000/api/forge/callback/oauth</b> as Callback URL. Finally take note of the <b>Client ID</b> and <b>Client Secret</b>.
 
 You also need an Egnyte Developer credentials. Visit the [Egnyte Developer](https://developers.egnyte.com), Log in or Sign up, follow the steps to an Egnyte application. For this new app, use <b>http://localhost:3000/api/box/callback/oauth</b> as redirect_uri. Finally, take note of the <b>client_id</b> and <b>client_secret</b>.
+
+Follow the steps outlined in this blog post to generate the SSL key for local https testing [https://forge.autodesk.com/blog/enable-https-local-nodejs](https://forge.autodesk.com/blog/enable-https-local-nodejs)
 
 ### Run locally
 
@@ -53,7 +55,7 @@ Windows (use <b>Node.js command line</b> from Start menu)
     set EGNYTE_CLIENT_SECRET=<<YOUR EGNYTE CLIENT SECRET>>
     npm run dev
 
-Open the browser: [http://localhost:3000](http://localhost:3000).
+Open the browser: [https://localhost:3000](https://localhost:3000).
 
 <b>Important:</b> do not use <b>npm start</b> locally, this is intended for PRODUCTION only with HTTPS (SSL) secure cookies.
 
@@ -62,8 +64,6 @@ Open the browser: [http://localhost:3000](http://localhost:3000).
 To deploy this application to Heroku, the <b>Callback URL</b> & <b>redirect_uri</b> must use your .herokuapp.com address. After clicking on the button below, at the Heroku Create New App page, set your Client ID & Secret and the correct callback URL.
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
-
-Watch [this video](https://www.youtube.com/watch?v=Oqa9O20Gj0c) on how deploy this sample to Heroku.
 
 ## Packages used
 
