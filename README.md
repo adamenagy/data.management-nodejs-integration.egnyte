@@ -12,7 +12,7 @@
 
 # Description
 
-This sample show a simple integration [Data Management API](https://developer.autodesk.com/en/docs/data/v2/overview/) and [Egnyte](https://www.egnyte.com). The front-end will look like:
+This sample is based on [Augusto](https://forge.autodesk.com/author/augusto-goncalves)'s [Box-Forge integration sample](https://github.com/Autodesk-Forge/data.management-nodejs-integration.box) and shows a simple integration between [Data Management API](https://developer.autodesk.com/en/docs/data/v2/overview/) and [Egnyte](https://www.egnyte.com). The front-end will look like:
   
 ![](www/img/indexpage.png)
 
@@ -24,7 +24,7 @@ This sample show a simple integration [Data Management API](https://developer.au
 
 For using this sample, you need an Autodesk developer credentials. Visit the [Forge Developer Portal](https://developer.autodesk.com), sign up for an account, then [create an app](https://developer.autodesk.com/myapps/create). For this new app, use <b>http://localhost:3000/api/forge/callback/oauth</b> as Callback URL. Finally take note of the <b>Client ID</b> and <b>Client Secret</b>.
 
-You also need an Egnyte Developer credentials. Visit the [Egnyte Developer](https://developers.egnyte.com), Log in or Sign up, follow the steps to an Egnyte application. For this new app, use <b>http://localhost:3000/api/box/callback/oauth</b> as redirect_uri. Finally, take note of the <b>client_id</b> and <b>client_secret</b>.
+You also need an Egnyte Developer credentials. Visit the [Egnyte Developer](https://developers.egnyte.com), Log in or Sign up, follow the steps to an Egnyte application. For this new app, use <b>http://localhost:3000/api/egnyte/callback/oauth</b> as redirect_uri. Finally, take note of the <b>client_id</b> and <b>client_secret</b>.
 
 Follow the steps outlined in this blog post to generate the SSL key for local https testing [https://forge.autodesk.com/blog/enable-https-local-nodejs](https://forge.autodesk.com/blog/enable-https-local-nodejs)
 
@@ -68,7 +68,7 @@ To deploy this application to Heroku, the <b>Callback URL</b> & <b>redirect_uri<
 
 ## Packages used
 
-All Autodesk Forge NPM packages are included by default, see complete list of what's available at [NPM website](https://www.npmjs.com/browse/keyword/autodesk). OAuth and Data Management API are used. [Box SDK](https://docs.box.com/page/sdks) for NodeJS is [box-node-sdk](https://www.npmjs.com/package/box-node-sdk). Some other non-Autodesk packaged are used, including [express](https://www.npmjs.com/package/express) and its session/cookie middlewares ([express-session](https://www.npmjs.com/package/express-session) and [cookie-parser](https://www.npmjs.com/package/cookie-parser)) for user session handling. The front-end uses [bootsrap](https://www.npmjs.com/package/bootstrap) and [jquery](https://www.npmjs.com/package/jquery).
+All Autodesk Forge NPM packages are included by default, see complete list of what's available at [NPM website](https://www.npmjs.com/browse/keyword/autodesk). OAuth and Data Management API are used. [Egnyte SDK](https://developers.egnyte.com/Egnyte_SDK) for NodeJS/JavaScript is **egnyte-js-sdk** that you can install using npm `npm install egnyte-js-sdk`. Some other non-Autodesk packaged are used, including [express](https://www.npmjs.com/package/express) and its session/cookie middlewares ([express-session](https://www.npmjs.com/package/express-session) and [cookie-parser](https://www.npmjs.com/package/cookie-parser)) for user session handling. The front-end uses [bootsrap](https://www.npmjs.com/package/bootstrap) and [jquery](https://www.npmjs.com/package/jquery).
 
 # Tips & tricks
 
