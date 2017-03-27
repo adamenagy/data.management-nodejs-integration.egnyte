@@ -44,7 +44,7 @@ function respondWithError(res, error) {
 router.get('/egnyte/profile', function (req, res) {
     var tokenSession = new token(req.session);
 
-    var egnyte = egnyteSDK.init("https://autodesktesting.egnyte.com", {
+    var egnyte = egnyteSDK.init(req.session.egnyteURL, {
         token: tokenSession.getEgnyteToken()
     });
 
@@ -69,8 +69,10 @@ router.get('/egnyte/authenticate', function (req, res) {
     // &client_secret=SECRET_KEY&redirect_uri=https://yourapp.com/oauth
     // &scope=Egnyte.filesystem&state=apidemo123&response_type=code
 
+    req.session.egnyteURL = "https://" + req.query.account + ".egnyte.com";
+
     var url =
-        'https://autodesktesting.egnyte.com/puboauth/token?' +
+        req.session.egnyteURL + '/puboauth/token?' +
         'client_id=' + config.egnyte.credentials.client_id +
         '&client_secret=' + config.egnyte.credentials.client_secret +
         '&redirect_uri=' + config.egnyte.callbackURL +
@@ -86,7 +88,7 @@ router.get('/api/egnyte/callback/oauth', function (req, res) {
     var tokenSession = new token(req.session);
 
     request({
-        url: "https://autodesktesting.egnyte.com/puboauth/token",
+        url: req.session.egnyteURL + "/puboauth/token",
         method: "POST",
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
@@ -127,7 +129,7 @@ router.get('/egnyte/getTreeNode', function (req, res) {
         return;
     }
 
-    var egnyte = egnyteSDK.init("https://autodesktesting.egnyte.com", {
+    var egnyte = egnyteSDK.init(req.session.egnyteURL, {
         token: tokenSession.getEgnyteToken()
     });
 

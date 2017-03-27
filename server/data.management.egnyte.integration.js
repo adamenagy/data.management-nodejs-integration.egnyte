@@ -96,7 +96,7 @@ router.post('/integration/sendToEgnyte', jsonParser, function (req, res) {
                 }
                 // end of workaround
 
-                var egnyte = egnyteSDK.init("https://autodesktesting.egnyte.com", {
+                var egnyte = egnyteSDK.init(req.session.egnyteURL, {
                     token: tokenSession.getEgnyteToken()
                 });
 
@@ -113,7 +113,7 @@ router.post('/integration/sendToEgnyte', jsonParser, function (req, res) {
                  });
                  */
                 request({
-                    url: 'https://autodesktesting.egnyte.com/pubapi/v1/fs-content/' + egnyteFolderId + "/" + fileName,
+                    url: req.session.egnyteURL + '/pubapi/v1/fs-content/' + egnyteFolderId + "/" + fileName,
                     method: "POST",
                     headers: {
                         'Authorization': 'Bearer ' + tokenSession.getEgnyteToken(),
@@ -279,7 +279,7 @@ function sendToAutodesk(projectId, folderId, egnyteFileId, res, req) {
     var tokenSession = new token(req.session);
 
     /*
-     var egnyte = egnyteSDK.init("https://autodesktesting.egnyte.com", {
+     var egnyte = egnyteSDK.init(req.session.egnyteURL, {
      token: tokenSession.getEgnyteToken()
      });
 
@@ -298,7 +298,7 @@ function sendToAutodesk(projectId, folderId, egnyteFileId, res, req) {
     var fileName = paths[paths.length - 1];
 
     request({
-        url: "https://autodesktesting.egnyte.com/pubapi/v1/fs-content/" + egnyteFileId,
+        url: req.session.egnyteURL + "/pubapi/v1/fs-content/" + egnyteFileId,
         encoding: null,
         method: "GET",
         headers: {'Authorization': 'Bearer ' + tokenSession.getEgnyteToken()}

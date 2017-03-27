@@ -36,8 +36,9 @@ $(document).ready(function () {
 });
 
 function egnyteLogin() {
+    var egnyteAccountName = $('#egnyteAccountName').val();
     jQuery.ajax({
-        url: '/egnyte/authenticate',
+        url: '/egnyte/authenticate?account=' + egnyteAccountName,
         success: function (rootUrl) {
             location.href = rootUrl;
         }
